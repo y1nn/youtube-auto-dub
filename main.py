@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 """
-YouTube Auto Dub - Day 03
-Added basic YouTube downloading functionality
+YouTube Auto Dub - Day 04
+Enhanced YouTube downloading and media processing
 """
 
 import sys
 import os
+from pathlib import Path
 
 # Add src directory to path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
 try:
-    from core_utils import setup_directories, validate_url, get_video_id
+    from core_utils import setup_directories, validate_url, get_video_id, Config
     from youtube import YouTubeDownloader
+    from media import AudioProcessor, VideoProcessor
 except ImportError as e:
     print(f"Error: {e}")
     sys.exit(1)
@@ -40,16 +42,28 @@ def main():
     video_info = downloader.get_video_info(youtube_url)
     if video_info:
         print(f"Video found: {video_info.get('title', 'Unknown')}")
+        print(f"Duration: {video_info.get('duration', 0)} seconds")
     else:
         print("Failed to get video info!")
         return
     
-    # TODO: Implement actual video download
-    print("Ready to download video...")
+    # Download audio
+    audio_file = downloader.download_audio(youtube_url)
+    if audio_file and Path(audio_file).exists():
+        print(f"Audio downloaded: {audio_file}")
+        
+        # Process audio
+        audio_processor = AudioProcessor()
+        processed_audio = audio_processor.extract_audio(audio_file)
+        print(f"Audio processed: {processed_audio}")
+    else:
+        print("Failed to download audio!")
+        return
     
-    # TODO: Implement audio processing
+    # TODO: Implement speech-to-text
     # TODO: Implement text translation
     # TODO: Implement voice synthesis
+    # TODO: Implement video reconstruction
     
     print("YouTube Auto Dub - Finished!")
 
