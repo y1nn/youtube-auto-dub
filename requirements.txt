@@ -1,5 +1,5 @@
-# YouTube Auto Dub Requirements - Day 05
-# Enhanced dependencies for translation and TTS
+# YouTube Auto Dub Requirements - Day 06
+# Enhanced dependencies for improved audio processing
 
 # YouTube downloading
 yt-dlp>=2023.1.0
@@ -24,3 +24,7 @@ edge-tts>=6.1.0
 # faster-whisper>=0.2.0
 # pyannote.audio>=2.0.0
 # demucs>=3.0.0
+
+# Additional utilities for enhanced processing
+tqdm>=4.64.0  # Progress bars
+colorama>=0.4.4  # Colored output

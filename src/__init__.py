@@ -1,7 +1,7 @@
 """
-YouTube Auto Dub Package - Day 05
-Enhanced package with translation and TTS
+YouTube Auto Dub Package - Day 06
+Enhanced package with improved audio processing
 """
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 __author__ = "YouTube Auto Dub Team"

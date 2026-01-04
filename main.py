@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-YouTube Auto Dub - Day 05
-Enhanced with translation and TTS functionality
+YouTube Auto Dub - Day 06
+Enhanced audio processing and file handling
 """
 
 import sys
@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
 try:
-    from core_utils import setup_directories, validate_url, get_video_id, Config
+    from core_utils import setup_directories, validate_url, get_video_id, Config, clean_temp_files
     from youtube import YouTubeDownloader
     from media import AudioProcessor, VideoProcessor
     from engines import TranslationEngine, TTSEngine, STTEngine, DiarizationEngine
@@ -20,11 +20,51 @@ except ImportError as e:
     print(f"Error: {e}")
     sys.exit(1)
 
+def process_audio_pipeline(audio_file):
+    """Complete audio processing pipeline"""
+    print(f"Starting audio processing pipeline for: {audio_file}")
+    
+    # Initialize audio processor
+    audio_processor = AudioProcessor()
+    
+    # Get audio info
+    audio_info = audio_processor.get_audio_info(audio_file)
+    if audio_info:
+        print(f"Audio info: {audio_info}")
+    
+    # Split audio into chunks for better processing
+    chunks = audio_processor.split_audio(audio_file, chunk_duration=30)
+    print(f"Audio split into {len(chunks)} chunks")
+    
+    # Process each chunk
+    transcriptions = []
+    stt_engine = STTEngine()
+    
+    for i, chunk in enumerate(chunks):
+        print(f"Processing chunk {i+1}/{len(chunks)}: {chunk}")
+        
+        # Transcribe chunk
+        transcription = stt_engine.transcribe(chunk, language='en')
+        transcriptions.append({
+            'chunk': i,
+            'file': chunk,
+            'text': transcription
+        })
+    
+    # Combine transcriptions
+    full_transcription = ' '.join([t['text'] for t in transcriptions])
+    print(f"Full transcription: {full_transcription[:100]}...")
+    
+    return transcriptions, full_transcription
+
 def main():
     print("YouTube Auto Dub - Starting...")
     
     # Setup directories
     setup_directories()
+    
+    # Clean old temp files
+    clean_temp_files()
     
     # TODO: Get YouTube URL from user
     youtube_url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"  # Placeholder
@@ -53,28 +93,24 @@ def main():
     if audio_file and Path(audio_file).exists():
         print(f"Audio downloaded: {audio_file}")
         
-        # Process audio
-        audio_processor = AudioProcessor()
-        processed_audio = audio_processor.extract_audio(audio_file)
-        if processed_audio:
-            print(f"Audio processed: {processed_audio}")
-            
-            # Transcribe audio
-            stt_engine = STTEngine()
-            transcription = stt_engine.transcribe(processed_audio, language='en')
-            print(f"Transcription: {transcription}")
-            
+        # Process audio through pipeline
+        transcriptions, full_transcription = process_audio_pipeline(audio_file)
+        
+        if full_transcription:
             # Translate text
             translator = TranslationEngine()
-            translated_text = translator.translate(transcription, 'es')
-            print(f"Translation: {translated_text}")
+            translated_text = translator.translate(full_transcription, 'es')
+            print(f"Translation: {translated_text[:100]}...")
             
             # Synthesize speech
             tts_engine = TTSEngine()
             tts_audio = tts_engine.synthesize(translated_text, 'es', voice='female')
-            print(f"TTS audio: {tts_audio}")
+            if tts_audio and Path(tts_audio).exists():
+                print(f"TTS audio created: {tts_audio}")
+            else:
+                print("Failed to create TTS audio!")
         else:
-            print("Failed to process audio!")
+            print("Failed to transcribe audio!")
     else:
         print("Failed to download audio!")
         return
