@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Auto Dub — AI Video Dubbing</title>
+    <meta name="description"
+        content="Automatically dub YouTube videos into 100+ languages using AI. Free, open-source video dubbing pipeline.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css?v=2">
+</head>
+
+<body>
+
+    <!-- ═══ Animated Background ═══ -->
+    <div class="bg-effects">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- ═══ Main Container ═══ -->
+    <div class="container">
+
+        <!-- ═══ Header ═══ -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="48" height="48" rx="12" fill="url(#grad)" />
+                        <path d="M18 14L34 24L18 34V14Z" fill="white" />
+                        <circle cx="36" cy="36" r="10" fill="#6C63FF" />
+                        <path d="M33 33H39M33 36H39M33 39H37" stroke="white" stroke-width="1.5"
+                            stroke-linecap="round" />
+                        <defs>
+                            <linearGradient id="grad" x1="0" y1="0" x2="48" y2="48">
+                                <stop stop-color="#FF0050" />
+                                <stop offset="1" stop-color="#FF6B35" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <h1>YouTube Auto Dub</h1>
+                    <p class="tagline">AI-Powered Video Dubbing</p>
+                </div>
+            </div>
+            <div class="system-status" id="systemStatus">
+                <span class="status-dot"></span>
+                <span class="status-text">Checking...</span>
+            </div>
+        </header>
+
+        <!-- ═══ Main Card ═══ -->
+        <main class="main-card glass-card">
+
+            <!-- ═══ Form Section ═══ -->
+            <form id="dubForm" class="dub-form">
+
+                <!-- URL Input -->
+                <div class="form-group url-group">
+                    <label for="urlInput">
+                        <span class="label-icon">🔗</span>
+                        YouTube URL
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="url" id="urlInput" placeholder="https://www.youtube.com/watch?v=..." required
+                            autocomplete="off">
+                        <div class="input-glow"></div>
+                    </div>
+                    <span class="input-hint" id="urlHint"></span>
+                </div>
+
+                <!-- Language Selector -->
+                <div class="form-row">
+                    <div class="form-group flex-2">
+                        <label for="langSelect">
+                            <span class="label-icon">🌍</span>
+                            Target Language
+                        </label>
+                        <div class="select-wrapper">
+                            <input type="text" id="langSearch" class="lang-search" placeholder="Search language..."
+                                autocomplete="off">
+                            <select id="langSelect" required>
+                                <option value="">Loading languages...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Voice Gender -->
+                    <div class="form-group flex-1">
+                        <label>
+                            <span class="label-icon">🎙️</span>
+                            Voice
+                        </label>
+                        <div class="toggle-group">
+                            <button type="button" class="toggle-btn active" data-gender="female">
+                                <span>♀</span> Female
+                            </button>
+                            <button type="button" class="toggle-btn" data-gender="male">
+                                <span>♂</span> Male
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Options Row -->
+                <div class="form-row options-row">
+                    <label class="switch-label">
+                        <div class="switch-info">
+                            <span class="label-icon">⚡</span>
+                            GPU Acceleration
+                        </div>
+                        <div class="switch">
+                            <input type="checkbox" id="gpuToggle">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+
+                    <label class="switch-label">
+                        <div class="switch-info">
+                            <span class="label-icon">💬</span>
+                            Subtitles
+                        </div>
+                        <div class="switch">
+                            <input type="checkbox" id="subtitleToggle">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span class="btn-text">🚀 Start Dubbing</span>
+                    <span class="btn-loading" style="display:none;">
+                        <span class="spinner"></span> Processing...
+                    </span>
+                </button>
+            </form>
+
+            <!-- ═══ Progress Section (hidden until job starts) ═══ -->
+            <div class="progress-section" id="progressSection" style="display:none;">
+                <div class="progress-header">
+                    <h2>🎬 Dubbing in Progress</h2>
+                    <span class="job-id" id="jobIdLabel"></span>
+                </div>
+
+                <!-- Overall Progress Bar -->
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                    <span class="progress-text" id="progressText">0%</span>
+                </div>
+
+                <!-- Pipeline Stages -->
+                <div class="stages" id="stagesContainer">
+                    <div class="stage" data-stage="download">
+                        <div class="stage-icon">📥</div>
+                        <div class="stage-info">
+                            <span class="stage-label">Download Video</span>
+                            <span class="stage-status">Waiting</span>
+                        </div>
+                        <div class="stage-indicator"></div>
+                    </div>
+                    <div class="stage" data-stage="transcribe">
+                        <div class="stage-icon">🎤</div>
+                        <div class="stage-info">
+                            <span class="stage-label">Transcribe Speech</span>
+                            <span class="stage-status">Waiting</span>
+                        </div>
+                        <div class="stage-indicator"></div>
+                    </div>
+                    <div class="stage" data-stage="chunk">
+                        <div class="stage-icon">✂️</div>
+                        <div class="stage-info">
+                            <span class="stage-label">Chunk Audio</span>
+                            <span class="stage-status">Waiting</span>
+                        </div>
+                        <div class="stage-indicator"></div>
+                    </div>
+                    <div class="stage" data-stage="translate">
+                        <div class="stage-icon">🌍</div>
+                        <div class="stage-info">
+                            <span class="stage-label">Translate Text</span>
+                            <span class="stage-status">Waiting</span>
+                        </div>
+                        <div class="stage-indicator"></div>
+                    </div>
+                    <div class="stage" data-stage="tts">
+                        <div class="stage-icon">🔊</div>
+                        <div class="stage-info">
+                            <span class="stage-label">Voice Synthesis</span>
+                            <span class="stage-status">Waiting</span>
+                        </div>
+                        <div class="stage-indicator"></div>
+                    </div>
+                    <div class="stage" data-stage="render">
+                        <div class="stage-icon">🎬</div>
+                        <div class="stage-info">
+                            <span class="stage-label">Render Video</span>
+                            <span class="stage-status">Waiting</span>
+                        </div>
+                        <div class="stage-indicator"></div>
+                    </div>
+                </div>
+
+                <!-- Status Message -->
+                <div class="status-message" id="statusMessage">
+                    Initializing pipeline...
+                </div>
+            </div>
+
+            <!-- ═══ Result Section ═══ -->
+            <div class="result-section" id="resultSection" style="display:none;">
+                <div class="result-card success" id="resultSuccess" style="display:none;">
+                    <div class="result-icon">✅</div>
+                    <h3>Dubbing Complete!</h3>
+                    <p id="resultMessage"></p>
+                    <a href="#" class="download-btn" id="downloadBtn">
+                        📥 Download Video
+                    </a>
+                </div>
+                <div class="result-card error" id="resultError" style="display:none;">
+                    <div class="result-icon">❌</div>
+                    <h3>Dubbing Failed</h3>
+                    <p id="errorMessage"></p>
+                    <button class="retry-btn" id="retryBtn">🔄 Try Again</button>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- ═══ Footer ═══ -->
+        <footer class="footer">
+            <p>Powered by <strong>Whisper AI</strong> · <strong>Google Translate</strong> · <strong>Edge TTS</strong>
+            </p>
+            <p class="footer-sub">youtube-auto-dub — Open Source on GitHub</p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js?v=2"></script>
+</body>
+
+</html>

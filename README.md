@@ -82,6 +82,27 @@ python main.py "https://youtube.com/watch?v=VIDEO_ID" --lang ja --browser chrome
 python main.py "https://youtube.com/watch?v=VIDEO_ID" --lang de --cookies cookies.txt
 ```
 
+### 🌐 Web Interface
+
+A modern web UI is also available for easier usage:
+
+```bash
+# Start the web server
+python web_app.py
+
+# Open in browser
+# http://localhost:5000
+```
+
+**Web Interface Features:**
+- 🎨 Modern dark UI with real-time progress tracking
+- ⚡ GPU acceleration toggle
+- 🌍 Search & select from 75+ languages
+- 🎙️ Male/female voice selection
+- 💬 Optional subtitle generation
+- 🔄 Progress persists across page refreshes (via SSE + polling fallback)
+- 📥 One-click download of dubbed video
+
 ## 📖 Usage Guide
 
 ### Command Line Options
@@ -255,21 +276,26 @@ python main.py "URL" --lang es --gpu
 ```
 youtube-auto-dub/
 ├── main.py                 # CLI entry point
+├── web_app.py              # Web interface (Flask server)
 ├── requirements.txt        # Python dependencies
-├── language_map.json      # Language-to-voice mappings
-├── README.md              # This file
-├── src/                   # Source code
-│   ├── engines.py         # AI/ML engines
-│   ├── youtube.py         # YouTube downloader
-│   ├── media.py           # Audio/video processing
+├── language_map.json       # Language-to-voice mappings
+├── README.md               # This file
+├── src/                    # Source code
+│   ├── engines.py          # AI/ML engines
+│   ├── youtube.py          # YouTube downloader
+│   ├── media.py            # Audio/video processing
 │   ├── audio_separation.py # Demucs audio separation
 │   ├── speaker_diarization.py # Pyannote speaker diarization
-│   ├── googlev4.py       # Google Translate scraper
-│   └── core_utils.py      # Shared utilities
-├── tests/                 # Test files
-├── .cache/               # Downloaded YouTube content
-├── output/               # Final dubbed videos
-└── temp/                 # Temporary processing files
+│   ├── googlev4.py         # Google Translate scraper
+│   └── core_utils.py       # Shared utilities
+├── static/                 # Web UI assets
+│   ├── app.js              # Frontend logic (SSE + polling)
+│   └── style.css           # Dark theme styling
+├── templates/              # Flask templates
+│   └── index.html          # Main web page
+├── .cache/                 # Downloaded YouTube content
+├── output/                 # Final dubbed videos
+└── temp/                   # Temporary processing files
 ```
 
 ## 🧪 Development
@@ -284,11 +310,11 @@ The project follows Google Style docstrings and includes:
 
 ### Future Roadmap
 
+- [x] Web interface for easier usage
 - [ ] Local LLM translation support
 - [ ] 4K rendering profiles
 - [ ] Voice cloning integration
 - [ ] Batch processing capabilities
-- [ ] Web interface for easier usage
 
 ## 📄 License
 

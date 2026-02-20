@@ -1,8 +1,33 @@
+# ═══ Python ═══
 __pycache__/
-*.pyc
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ═══ Virtual Environment ═══
+venv/
+.venv/
+env/
+
+# ═══ Pipeline Directories ═══
 .cache/
-temp/
 output/
-*.mp4
-*.wav
-*.mp3
+temp/
+
+# ═══ IDE / Editor ═══
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ═══ OS Files ═══
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ═══ Misc ═══
+*.log
+.env

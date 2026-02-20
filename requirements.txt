@@ -1,7 +1,9 @@
 yt-dlp
 openai-whisper
+faster-whisper
 torch
 edge-tts
+flask
 httpx
 beautifulsoup4
 browserforge
